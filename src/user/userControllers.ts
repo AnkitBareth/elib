@@ -52,10 +52,39 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
     //Send the response
 
-    res.json({ accessToken: token });
+    res.status(201).json({ accessToken: token });
   } catch (error) {
     return next(createHttpError(500, "Error while signing the jwt token"));
   }
 };
 
-export { createUser };
+const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  //get the data from request
+  const { email, password } = req.body;
+
+  //Validation
+  if (!email || !password) {
+    return next(createHttpError(400, "Please enter all fields"));
+  }
+  //handle errors
+  //wrapping the database call in try catch block as todo: refactor this
+  const user = await userModel.findOne({ email });
+  if (!user) {
+    return next(createHttpError(404, "user not found"));
+  }
+
+  const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordMatch)
+    return next(createHttpError(400, "Username or password is incorrect"));
+
+  // create access token
+
+  const token = sign({ sub: user._id }, config.jwtSecret as string, {
+    expiresIn: "7d",
+  });
+
+  res.json({ accessToken: token });
+};
+
+export { createUser, loginUser };
