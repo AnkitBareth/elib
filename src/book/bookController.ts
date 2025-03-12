@@ -43,7 +43,8 @@ const createBook = async (
         format: "pdf",
       }
     );
-
+    // @ts-ignore
+    console.log("userID", req.userId);
     // Create book with all required fields
     const newBook = await bookModel.create({
       title,
