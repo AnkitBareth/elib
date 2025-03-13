@@ -148,4 +148,17 @@ const updateBook = async (
   }
 };
 
-export { createBook, updateBook };
+const listBooks = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const books = await bookModel.find();
+    res.json({ books });
+  } catch (error) {
+    return next(createHttpError(500, "Error while getting books"));
+  }
+};
+
+export { createBook, updateBook, listBooks };
