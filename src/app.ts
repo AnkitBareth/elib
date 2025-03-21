@@ -7,11 +7,22 @@ import bookRouter from "./book/bookRouter";
 import { config } from "./config/config";
 
 const app = express();
+
 app.use(
   cors({
     origin: config.frontendDomain,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+    ],
   })
 );
+
 app.use(express.json());
 /* app.use(express.urlencoded({ extended: true })); */
 

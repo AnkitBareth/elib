@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import cloudinary from "../config/cloudinary";
-import path from "node:path";
+import path, { resolve } from "node:path";
 import fs from "fs";
 import bookModel from "./bookModel";
 import { AuthRequest } from "../middlewares/authenticate";
@@ -153,8 +153,9 @@ const listBooks = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  const sleep = await new Promise((resolve) => setTimeout(resolve, 5000));
   try {
-    const books = await bookModel.find();
+    const books = await bookModel.find().populate("author", "name");
     res.json({ books });
   } catch (error) {
     return next(createHttpError(500, "Error while getting books"));
@@ -168,7 +169,9 @@ const getSingleBook = async (
 ): Promise<void> => {
   const bookId = req.params.bookId;
   try {
-    const book = await bookModel.findOne({ _id: bookId });
+    const book = await bookModel
+      .findOne({ _id: bookId })
+      .populate("author", "name");
     if (!book) {
       return next(createHttpError(404, "Book not found"));
     }
